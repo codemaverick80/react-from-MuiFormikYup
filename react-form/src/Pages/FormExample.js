@@ -22,6 +22,12 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 
+/*Select Components */
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Select from "@material-ui/core/Select";
+
 /* Formaik component */
 import { Formik, Form, Field, validateYupSchema } from "formik";
 
@@ -75,6 +81,7 @@ const INITIAL_FORM_STATE = {
   lastName: "",
   email: "",
   phone: "",
+  maritalStatus: "",
   dateOfBirth: setDateFormat(new Date()),
 };
 /* Form Validation schema for Yup */
@@ -88,11 +95,47 @@ const FORM_VALIDATION = Yup.object().shape({
     .integer()
     .typeError("Please enter a valid phone number")
     .required("Phone is required"),
+  maritalStatus: Yup.string().required("Required"),
   // date: Yup.date().required("Required"),
 });
 
+const maritalStatus = [
+  {
+    value: "single",
+    label: "Single",
+  },
+  {
+    value: "married",
+    label: "Married",
+  },
+  {
+    value: "divorce",
+    label: "Divorce",
+  },
+  {
+    value: "widowed",
+    label: "Widowed",
+  },
+];
+
 const FormExample = () => {
   const classes = useStyles();
+
+  // const [maritialStatus, setMaritialStatus] = React.useState("");
+  // const [open, setOpen] = React.useState(false);
+
+  // const handleChange = (event) => {
+  //   setMaritialStatus(event.target.value);
+  // };
+
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
+
+  // const handleOpen = () => {
+  //   setOpen(true);
+  // };
+
   return (
     <Grid item xs={12}>
       <Container maxWidth="md">
@@ -116,13 +159,13 @@ const FormExample = () => {
                     <Typography>Form</Typography>
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={6}>
+                  <Grid item xs={12} sm={12} md={6}>
                     <CustomTextField name="firstName" label="First Name" />
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={6}>
-                    /* Material-ui TextFiel hooking with Formik and Yup
-                    validation */
+                  <Grid item xs={12} sm={12} md={6}>
+                    {/* Material-ui TextField hooking with Formik and Yup
+                    validation */}
                     <TextField
                       id="lastName"
                       name="lastName"
@@ -140,20 +183,51 @@ const FormExample = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={6}>
+                  <Grid item xs={12} sm={12} md={6}>
                     <CustomTextField name="email" label="Email" />
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={6}>
+                  <Grid item xs={12} sm={12} md={6}>
                     <CustomTextField name="phone" label="Phone" />
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={6}>
+                  <Grid item xs={12} sm={12} md={6}>
                     <Field
                       name="dateOfBirth"
                       label="Date of Birth"
                       component={CustomDatePicker}
                     />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12} md={6}>
+                    <TextField
+                      // style={{ width: "200px" }}
+                      fullWidth
+                      variant="outlined"
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      select
+                      label="Marital Status"
+                      value={props.values.maritalStatus}
+                      onChange={props.handleChange}
+                      error={
+                        props.touched.maritalStatus &&
+                        Boolean(props.errors.maritalStatus)
+                      }
+                      helperText={
+                        props.touched.maritalStatus &&
+                        props.errors.maritalStatus
+                      }
+                    >
+                      {/* <MenuItem key={""} value={""}>
+                        No Selected
+                      </MenuItem> */}
+                      {maritalStatus.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={12}>
