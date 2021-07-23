@@ -39,7 +39,10 @@ import CustomTextField from "../Components/FormsUI/CustomTextField";
 import CustomDatePicker from "../Components/FormsUI/CustomDatePicker";
 import { DisplayFormikProps } from "./DisplayFormikProps";
 
-/* Component level setting */
+import countries from "../data/countries.json";
+import { top100Movies } from "../data/top100movies";
+import SelectWrapper from "../Components/FormsUI/CustomSelect";
+/* ======================= Component level setting ======================= */
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -47,6 +50,8 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(8),
   },
 }));
+
+/* Redio component style */
 
 const GreenRadio = withStyles({
   root: {
@@ -73,7 +78,7 @@ const setDateFormat = (date) => {
   return today;
 };
 
-/* Formik Form Configuration */
+/* ======================= Formik Form Configuration =======================*/
 
 /* form initial values */
 const INITIAL_FORM_STATE = {
@@ -83,6 +88,8 @@ const INITIAL_FORM_STATE = {
   phone: "",
   maritalStatus: "",
   dateOfBirth: setDateFormat(new Date()),
+  gender: "female",
+  country: "",
 };
 /* Form Validation schema for Yup */
 const FORM_VALIDATION = Yup.object().shape({
@@ -95,10 +102,13 @@ const FORM_VALIDATION = Yup.object().shape({
     .integer()
     .typeError("Please enter a valid phone number")
     .required("Phone is required"),
-  maritalStatus: Yup.string().required("Required"),
+  maritalStatus: Yup.string().required("Marital status is required"),
+  //gender: Yup.string().required("Gender is required"),
   // date: Yup.date().required("Required"),
+  country: Yup.string().required("Country is required"),
 });
 
+/* Marital Status Data */
 const maritalStatus = [
   {
     value: "single",
@@ -117,6 +127,8 @@ const maritalStatus = [
     label: "Widowed",
   },
 ];
+
+/* Gender Data */
 
 const FormExample = () => {
   const classes = useStyles();
@@ -228,6 +240,44 @@ const FormExample = () => {
                         </MenuItem>
                       ))}
                     </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl component="fieldset">
+                      {/* <FormLabel component="legend">Gender</FormLabel> */}
+                      <RadioGroup
+                        row
+                        aria-label="gender"
+                        name="gender"
+                        defaultValue=""
+                        value={props.values.gender}
+                        onChange={(e) =>
+                          props.setFieldValue("gender", e.currentTarget.value)
+                        }
+                      >
+                        <FormControlLabel
+                          value="male"
+                          control={<Radio color="primary" />}
+                          label="Male"
+                          labelPlacement="start"
+                        />
+
+                        <FormControlLabel
+                          value="female"
+                          control={<GreenRadio />}
+                          label="Female"
+                          labelPlacement="start"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item sx={12} sm={12} md={6}>
+                    <SelectWrapper
+                      name="country"
+                      label="Country"
+                      options={countries}
+                    />
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={12}>
