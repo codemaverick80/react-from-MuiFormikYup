@@ -14,13 +14,13 @@ const CustomDatePicker = ({ field, form, ...otherProps }) => {
       value={field.value}
       format="MM/dd/yyyy"
       helperText={currentError}
-      error={Boolean(currentError)}
-      onError={(error) => {
-        // handle as a side effect
-        if (error !== currentError) {
-          form.setFieldError(field.name, error);
-        }
-      }}
+      // error={Boolean(currentError)}
+      // onError={(error) => {
+      //   // handle as a side effect
+      //   if (error !== currentError) {
+      //     form.setFieldError(field.name, error);
+      //   }
+      // }}
       //// if you are using custom validation schema you probably want to pass `true` as third argument
       onChange={(date) => {
         form.setFieldValue(field.name, date, false);

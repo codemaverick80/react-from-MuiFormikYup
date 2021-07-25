@@ -1,27 +1,16 @@
 /*eslint-disable*/
 //https://www.youtube.com/watch?v=mu8-u7V7Z8s
 import { createTheme } from "@material-ui/core";
-import {
-  deepPurple,
-  deepOrange,
-  amber,
-  purple,
-  red,
-  pink,
-  grey,
-  blueGrey,
-  lime,
-  teal,
-} from "@material-ui/core/colors";
+import { deepPurple, purple, deepOrange, red, lightBlue, blueGrey, teal } from "@material-ui/core/colors";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: deepPurple[500],
+      main: purple[800],
     },
     secondary: {
-      main: amber[700],
-      contrastText: deepPurple[900],
+      main: lightBlue[800],
+      //contrastText: deepPurple[900],
     },
     error: {
       main: red["A700"],

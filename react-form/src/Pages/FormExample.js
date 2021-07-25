@@ -2,15 +2,7 @@
 import React from "react";
 
 /* Material UI components */
-import {
-  Container,
-  Grid,
-  Button,
-  Typography,
-  LinearProgress,
-  Checkbox,
-  TextField,
-} from "@material-ui/core";
+import { Container, Grid, Button, Typography, LinearProgress, Checkbox, TextField, FormGroup } from "@material-ui/core";
 import { KeyboardDatePicker, DatePicker } from "@material-ui/pickers";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { green, red } from "@material-ui/core/colors";
@@ -21,15 +13,14 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
+import { ErrorMessage } from "formik";
 
 /*Select Components */
-import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import Select from "@material-ui/core/Select";
 
-/* Formaik component */
-import { Formik, Form, Field, validateYupSchema } from "formik";
+/* Formik component */
+import { Formik, Form, Field, useFormikContext } from "formik";
 
 /* Yup form validaton */
 import * as Yup from "yup";
@@ -42,16 +33,21 @@ import { DisplayFormikProps } from "./DisplayFormikProps";
 import countries from "../data/countries.json";
 import { top100Movies } from "../data/top100movies";
 import SelectWrapper from "../Components/FormsUI/CustomSelect";
-/* ======================= Component level setting ======================= */
 
+/* ======================= Component level setting ======================= */
+import { deepOrange } from "@material-ui/core/colors";
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(8),
   },
+  radioError: {
+    textTransform: "uppercase",
+    color: `${deepOrange["A700"]}!important`,
+  },
 }));
 
-/* Redio component style */
+/* Radio component style */
 
 const GreenRadio = withStyles({
   root: {
@@ -82,30 +78,29 @@ const setDateFormat = (date) => {
 
 /* form initial values */
 const INITIAL_FORM_STATE = {
-  firstName: "",
+  firstName: "Harish",
   lastName: "",
-  email: "",
-  phone: "",
-  maritalStatus: "",
+  email: "harish@gmail.com",
+  phone: "5223456789",
+  maritalStatus: "married",
   dateOfBirth: setDateFormat(new Date()),
-  gender: "female",
-  country: "",
+  gender: "male",
+  country: "US",
+  lang: [],
+  rebuy: false,
 };
 /* Form Validation schema for Yup */
 const FORM_VALIDATION = Yup.object().shape({
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  phone: Yup.number()
-    .integer()
-    .typeError("Please enter a valid phone number")
-    .required("Phone is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+  phone: Yup.number().integer().typeError("Please enter a valid phone number").required("Phone is required"),
   maritalStatus: Yup.string().required("Marital status is required"),
-  //gender: Yup.string().required("Gender is required"),
+  dateOfBirth: Yup.date().required("Date is required"),
+  gender: Yup.string().required("Gender is required"),
   // date: Yup.date().required("Required"),
   country: Yup.string().required("Country is required"),
+  //lang: Yup.array().length(1, "Required").required("Required"),
 });
 
 /* Marital Status Data */
@@ -130,24 +125,35 @@ const maritalStatus = [
 
 /* Gender Data */
 
+const genderData = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+];
+
+/* Language Check Box data */
+
+const languageCheckBoxOptions = [
+  { key: "CSharp", value: "csharp" },
+  { key: "Javascript", value: "javascript" },
+  { key: "Html", value: "html" },
+  { key: "Css", value: "css" },
+];
+
+const AutoSubmitOnRebuy = () => {
+  // Grab values and submitForm from context
+  const { values, submitForm } = useFormikContext();
+  React.useEffect(() => {
+    // Submit the form imperatively as an effect as soon as form values.rebuy is true or gender is female
+    if (values.rebuy === true || values.gender === "female") {
+      submitForm();
+    }
+  }, [values, submitForm]);
+  return null;
+};
+
 const FormExample = () => {
   const classes = useStyles();
-
-  // const [maritialStatus, setMaritialStatus] = React.useState("");
-  // const [open, setOpen] = React.useState(false);
-
-  // const handleChange = (event) => {
-  //   setMaritialStatus(event.target.value);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
-
   return (
     <Grid item xs={12}>
       <Container maxWidth="md">
@@ -168,7 +174,7 @@ const FormExample = () => {
               <Form>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12} md={12}>
-                    <Typography>Form</Typography>
+                    <Typography>Personal information</Typography>
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={6}>
@@ -184,12 +190,8 @@ const FormExample = () => {
                       variant="outlined"
                       label="Last Name"
                       value={props.values.lastName}
-                      error={
-                        props.touched.lastName && Boolean(props.errors.lastName)
-                      }
-                      helperText={
-                        props.touched.lastName && props.errors.lastName
-                      }
+                      error={props.touched.lastName && Boolean(props.errors.lastName)}
+                      helperText={props.touched.lastName && props.errors.lastName}
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                     />
@@ -204,16 +206,26 @@ const FormExample = () => {
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={6}>
-                    <Field
+                    <Field name="dateOfBirth" label="Date of Birth" component={CustomDatePicker} />
+
+                    {/* <KeyboardDatePicker
+                      disableToolbar
                       name="dateOfBirth"
-                      label="Date of Birth"
-                      component={CustomDatePicker}
-                    />
+                      variant="inline"
+                      format="MM/dd/yyyy"
+                      margin="normal"
+                      id="date-picker-inline"
+                      label="Date picker inline"
+                      value={props.values.dateOfBirth}
+                      onChange={props.handleChange}
+                      KeyboardButtonProps={{
+                        "aria-label": "change date",
+                      }}
+                    /> */}
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={6}>
                     <TextField
-                      // style={{ width: "200px" }}
                       fullWidth
                       variant="outlined"
                       id="maritalStatus"
@@ -222,18 +234,9 @@ const FormExample = () => {
                       label="Marital Status"
                       value={props.values.maritalStatus}
                       onChange={props.handleChange}
-                      error={
-                        props.touched.maritalStatus &&
-                        Boolean(props.errors.maritalStatus)
-                      }
-                      helperText={
-                        props.touched.maritalStatus &&
-                        props.errors.maritalStatus
-                      }
+                      error={props.touched.maritalStatus && Boolean(props.errors.maritalStatus)}
+                      helperText={props.touched.maritalStatus && props.errors.maritalStatus}
                     >
-                      {/* <MenuItem key={""} value={""}>
-                        No Selected
-                      </MenuItem> */}
                       {maritalStatus.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
                           {option.label}
@@ -244,40 +247,24 @@ const FormExample = () => {
 
                   <Grid item xs={12} sm={12} md={6}>
                     <FormControl component="fieldset">
-                      {/* <FormLabel component="legend">Gender</FormLabel> */}
-                      <RadioGroup
-                        row
-                        aria-label="gender"
-                        name="gender"
-                        defaultValue=""
-                        value={props.values.gender}
-                        onChange={(e) =>
-                          props.setFieldValue("gender", e.currentTarget.value)
-                        }
-                      >
-                        <FormControlLabel
-                          value="male"
-                          control={<Radio color="primary" />}
-                          label="Male"
-                          labelPlacement="start"
-                        />
-
-                        <FormControlLabel
-                          value="female"
-                          control={<GreenRadio />}
-                          label="Female"
-                          labelPlacement="start"
-                        />
+                      <FormLabel component="legend">Gender</FormLabel>
+                      <RadioGroup row aria-label="gender" color="primary" name="gender" value={props.values.gender} onChange={props.handleChange}>
+                        {genderData.map((item) => {
+                          return <FormControlLabel key={item.value} value={item.value} control={<Radio color="primary" />} label={item.label} />;
+                        })}
                       </RadioGroup>
+                      <FormHelperText className={classes.radioError}>{props.errors.gender}</FormHelperText>
                     </FormControl>
                   </Grid>
 
                   <Grid item sx={12} sm={12} md={6}>
-                    <SelectWrapper
-                      name="country"
-                      label="Country"
-                      options={countries}
-                    />
+                    <SelectWrapper name="country" label="Country" options={countries} />
+                  </Grid>
+
+                  <Grid item sx={12} sm={12} md={6}>
+                    <FormGroup row>
+                      <FormControlLabel control={<Checkbox checked={props.values.rebuy} onChange={props.handleChange} name="rebuy" color="primary" />} label="Rebuy" />
+                    </FormGroup>
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={12}>
@@ -285,18 +272,15 @@ const FormExample = () => {
                   </Grid>
 
                   <Grid item xs={12} sm={12} md={12}>
-                    <Button
-                      type="submit"
-                      disabled={props.isSubmitting}
-                      variant="contained"
-                      color="primary"
-                    >
+                    <Button type="submit" disabled={props.isSubmitting} variant="contained" color="primary">
                       Submit
                     </Button>
                   </Grid>
                 </Grid>
 
                 <DisplayFormikProps {...props} />
+
+                <AutoSubmitOnRebuy />
               </Form>
             )}
           </Formik>
